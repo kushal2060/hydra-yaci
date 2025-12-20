@@ -1,0 +1,47 @@
+{
+  "name": "yaci-hydra",
+  "version": "1.0.0",
+  "description": "Payment channel application using Yaci DevKit and Hydra Head Protocol",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "prerequisites": "bash scripts/utils/check-prerequisites.sh",
+    "setup": "bash scripts/utils/setup-directories.sh && bash scripts/utils/download-hydra.sh",
+    "keys:generate": "bash scripts/1-generate-keys.sh",
+    "wallets:fund": "bash scripts/2-fund-addresses.sh",
+    "hydra:start": "bash scripts/3-start-hydra-nodes.sh",
+    "hydra:stop": "bash scripts/4-stop-hydra-nodes.sh",
+    "reset": "bash scripts/5-reset-all.sh",
+    "example:status": "node examples/01-check-yaci-status.js",
+    "example:addresses": "node examples/02-generate-addresses.js",
+    "example:fund": "node examples/03-fund-from-faucet.js",
+    "example:open": "node examples/04-open-hydra-head.js",
+    "example:workflow": "node examples/08-full-workflow.js",
+    "test": "echo \"Tests will be added in Phase 2\""
+  },
+  "keywords": [
+    "cardano",
+    "hydra",
+    "yaci",
+    "layer2",
+    "payment-channel"
+  ],
+  "author": "Kushal Acharya :)",
+  "license": "MIT",
+  "dependencies": {
+    "@lucid-evolution/lucid": "^0.3.0",
+    "@lucid-evolution/provider": "^0.1.0",
+    "axios": "^1.6.0",
+    "ws": "^8.16.0",
+    "dotenv": "^16.3.1",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/ws": "^8.5.10"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
