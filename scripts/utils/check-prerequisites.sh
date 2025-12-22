@@ -85,7 +85,7 @@ echo " Abailable disk space: $AVILABLE_SPACE"
 echo -e " ${YELLOW} Recommended: 5GB hunuparxa.${NC}"
 echo "-------------------------------------"
 
-if [ $ERRORS -eq 0]; then 
+if [ $ERRORS -eq 0 ]; then 
      echo -e "${GREEN}✓ All prerequisites met!${NC}"
      echo ""
      echo "Aru steps: "
