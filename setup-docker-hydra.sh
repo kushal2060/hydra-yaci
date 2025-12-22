@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Complete Docker Setup for ARM Mac
-# Run this to fix all Docker issues
+# use this if the cardano cli kam garena ra hydra ko binary ni kam garena
+#mainly for M1/M2 mac users
 
 set -e
 
