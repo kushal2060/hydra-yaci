@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#checking prerequisites sabbai ko lagi
+#checking prerequisites sabbai tech stack xa ki nai vanera
 
 set -e 
 
