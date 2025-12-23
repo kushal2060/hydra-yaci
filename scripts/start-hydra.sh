@@ -14,50 +14,27 @@ if ! curl -s http://localhost:8080/api/v1/epochs/latest > /dev/null 2>&1; then
     exit 1
 fi
 
-SOCKET_PATH="${CARDANO_NODE_SOCKET_PATH}"
-
-if [ ! -S "$SOCKET_PATH" ]; then
-    echo "Error: Cardano node socket not found at $SOCKET_PATH"
-   # Try to find socket
-    POSSIBLE_SOCKETS=(
-        "/tmp/yaci-devkit/node.socket"
-        "/tmp/node.socket"
-        "$HOME/.yaci-devkit/node.socket"
-    )
-    for sock in "${POSSIBLE_SOCKETS[@]}"; do
-        if [ -S "$sock" ]; then
-            SOCKET_PATH="$sock"
-            echo "Found socket at: $SOCKET_PATH"
-            break
-        fi
-    done
-    
-    if [ ! -S "$SOCKET_PATH" ]; then
-        echo "Error: Could not find Cardano node socket"
-        echo "Please check your Yaci DevKit installation"
-        exit 1
-    fi
-fi
-
-echo "Using node socket: $SOCKET_PATH"
+#check socat bridge
+SOCKET_PATH="/clusters/nodes/default/node/node.sock"
+echo "Using node socket: $SOCKET_PATH (from YACI container)"
 echo "Network magic: $NETWORK_MAGIC"
 echo ""
 
 #start hydra
-
 start_hydra_node() {
-    local NMAE=$1
-    local API_ROUT=$2
+    local NAME=$1
+    local API_PORT=$2
     local PEER_PORT=$3
     local MONITORING_PORT=$4
+    local ADVERTISED_HOST=$5  # NEW: Pass the host for this node
 
-    echo "Starting Hydra node for participant: $NMAE"
+    echo "Starting Hydra node for participant: $NAME"
 
-    local NODE_DIR="hydra-nodes/$NMAE"
+    local NODE_DIR="hydra-nodes/$NAME"
     local LOG_FILE="$NODE_DIR/logs/hydra-node.log"
     local PID_FILE="$NODE_DIR/hydra-node.pid"
 
-    #IF RUNNIG
+    #IF RUNNING
     if [ -f "$PID_FILE" ]; then
         PID=$(cat "$PID_FILE")
         if ps -p $PID > /dev/null 2>&1; then
@@ -68,7 +45,7 @@ start_hydra_node() {
 
     PEERS=""
     if [ "$NAME" != "alice" ]; then
-        PEERS="$PEERS --peer ${HYDRA_HOST_ALICE}:${HYDRA_PEER_PORT_ALICE}". #connectin to each other
+        PEERS="$PEERS --peer ${HYDRA_HOST_ALICE}:${HYDRA_PEER_PORT_ALICE}"
     fi
     if [ "$NAME" != "bob" ]; then
         PEERS="$PEERS --peer ${HYDRA_HOST_BOB}:${HYDRA_PEER_PORT_BOB}"
@@ -77,21 +54,30 @@ start_hydra_node() {
         PEERS="$PEERS --peer ${HYDRA_HOST_CAROL}:${HYDRA_PEER_PORT_CAROL}"
     fi
 
-    #start node
+   # Only include OTHER participants' keys (not our own)
+    ALL_KEYS=""
+    for other_participant in alice bob carol; do
+        if [ "$other_participant" != "$NAME" ]; then
+            ALL_KEYS="$ALL_KEYS --hydra-verification-key hydra-nodes/$other_participant/keys/hydra.vk"
+            ALL_KEYS="$ALL_KEYS --cardano-verification-key hydra-nodes/$other_participant/keys/cardano.vk"
+        fi
+    done
+
+    #start node with Ogmios
     nohup ./bin/hydra-node \
         --node-id "$NAME" \
         --api-host 0.0.0.0 \
         --api-port $API_PORT \
-        --host 0.0.0.0 \
-        --port $PEER_PORT \
+        --listen 0.0.0.0:$PEER_PORT \
+        --advertise "${ADVERTISED_HOST}:${PEER_PORT}" \
         --monitoring-port $MONITORING_PORT \
         --hydra-signing-key "$NODE_DIR/keys/hydra.sk" \
-        --hydra-verification-key "$NODE_DIR/keys/hydra.vk" \
         --cardano-signing-key "$NODE_DIR/keys/cardano.sk" \
-        --cardano-verification-key "$NODE_DIR/keys/cardano.vk" \
+        $ALL_KEYS \
         --ledger-protocol-parameters config/hydra/protocol-parameters.json \
         --testnet-magic $NETWORK_MAGIC \
         --node-socket "$SOCKET_PATH" \
+        --hydra-scripts-tx-id "$HYDRA_SCRIPTS_TX_ID" \
         --persistence-dir "$NODE_DIR/persistence" \
         $PEERS \
         > "$LOG_FILE" 2>&1 &
@@ -100,17 +86,16 @@ start_hydra_node() {
     echo $NODE_PID > "$PID_FILE"
     echo " Started (PID: $NODE_PID)"
     echo " API: http://localhost:$API_PORT"
-    echo " Peer: localhost:$PEER_PORT"
+    echo " Peer: $ADVERTISED_HOST:$PEER_PORT"
     echo " Logs: $LOG_FILE"
     echo ""
-
 }
 
 #protocol parameters file
 mkdir -p config/hydra
 if [ ! -f config/hydra/protocol-parameters.json ]; then
     echo "Creating protocol parameters file..."
-    cat > config/hydra/protocol-parameters.json <<'EOF'
+    cat > config/hydra/protocol-parameters.json <<'EOFPARAM'
 {
   "txFeePerByte": 44,
   "txFeeFixed": 155381,
@@ -132,6 +117,10 @@ if [ ! -f config/hydra/protocol-parameters.json ]; then
     "priceMemory": 0.0577,
     "priceSteps": 0.0000721
   },
+  "protocolVersion": {
+    "major": 10,
+    "minor": 0
+  },
   "maxTxExecutionUnits": {
     "memory": 14000000,
     "steps": 10000000000
@@ -145,18 +134,20 @@ if [ ! -f config/hydra/protocol-parameters.json ]; then
   "maxCollateralInputs": 3,
   "coinsPerUTxOByte": 4310
 }
-EOF
+EOFPARAM
     echo "  Created protocol parameters"
     echo ""
 fi
 
-#start nodes
-start_hydra_node "alice" $HYDRA_API_PORT_ALICE $HYDRA_PEER_PORT_ALICE $HYDRA_MONITORING_PORT_ALICE
-sleep 2
-start_hydra_node "bob" $HYDRA_API_PORT_BOB $HYDRA_PEER_PORT_BOB $HYDRA_MONITORING_PORT_BOB
-sleep 2
-start_hydra_node "carol" $HYDRA_API_PORT_CAROL $HYDRA_PEER_PORT_CAROL $HYDRA_MONITORING_PORT_CAROL
+#start nodes - NOW PASSING THE 5TH PARAMETER (ADVERTISED_HOST)
+start_hydra_node "alice" $HYDRA_API_PORT_ALICE $HYDRA_PEER_PORT_ALICE $HYDRA_MONITORING_PORT_ALICE $HYDRA_HOST_ALICE
+echo "Waiting for Alice to initialize cluster..."
+sleep 15
 
+start_hydra_node "bob" $HYDRA_API_PORT_BOB $HYDRA_PEER_PORT_BOB $HYDRA_MONITORING_PORT_BOB $HYDRA_HOST_BOB
+sleep 15
+
+start_hydra_node "carol" $HYDRA_API_PORT_CAROL $HYDRA_PEER_PORT_CAROL $HYDRA_MONITORING_PORT_CAROL $HYDRA_HOST_CAROL
 echo "waiting for Hydra nodes to start..."
 sleep 10
 
@@ -175,6 +166,7 @@ for node in "alice:$HYDRA_API_PORT_ALICE" "bob:$HYDRA_API_PORT_BOB" "carol:$HYDR
     else
         echo "   $NAME is NOT responding on port $PORT"
         echo "   Check logs: hydra-nodes/$NAME/logs/hydra-node.log"
+        cat hydra-nodes/$NAME/logs/hydra-node.log 
         ALL_RUNNING=false
     fi
 done
