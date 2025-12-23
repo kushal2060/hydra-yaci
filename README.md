@@ -5,7 +5,8 @@ This is a project for using Hydra protocols in a Yaci DevKit local network.
 
 The Hydra node is running from a Docker image.
 
-See the `setup-docker-hydra.sh` file for this setup.  
+See the `setup-docker-hydra.sh` file for this setup. 
+run this and wrapper will be generated. 
 A wrapper is provided in `bin/hydra-node`.  
 The same applies to `cardano-cli`; its wrapper is in `bin/cardano-cli`.  
 These wrappers generate keys for all participants.
