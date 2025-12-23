@@ -1,75 +1,73 @@
 #!/bin/bash
 
-# yaci devkit bata sabbai participant lai fun garne
-
-set -e 
-
+set -e
 source .env
 
-echo "Funding participant addresses from yaci devkit..."
-
-PARTICIPANTS=("alice" "bob" "carol")
-FUNDING_AMOUNT=${INITIAL_FUNDS:-1000000} 
-
-echo "funding amount per address: ${FUNDING_AMOUNT} ADA"
+echo "--------------------------------------------"
+echo "Funding Addresses Using Yaci CLI"
+echo "--------------------------------------------"
 echo ""
 
-for participant in "${PARTICIPANTS[@]}"; do
-    echo "Fundding $participant..."
+# Get addresses
+ALICE_ADDR=$(cat hydra-nodes/alice/keys/cardano.addr)
+BOB_ADDR=$(cat hydra-nodes/bob/keys/cardano.addr)
+CAROL_ADDR=$(cat hydra-nodes/carol/keys/cardano.addr)
 
-    ADDRESS=$(cat "hydra-nodes/$participant/keys/cardano.addr")
-    echo "Address: $ADDRESS"
+# Find Yaci CLI container
+# Find Yaci CLI container (by name first, then fallback to grep)
+CONTAINER=$(docker ps --filter "name=yaci-cli" --format "{{.Names}}" | head -1)
 
-    LOVELACE=$((FUNDING_AMOUNT * 1000000))
-    #yaci devkit topup api
-    echo "  Requesting $LOVELACE lovelace..."
+if [ -z "$CONTAINER" ]; then
+  CONTAINER=$(docker ps --format '{{.Names}} {{.Image}}' | awk '/yaci-cli/ {print $1; exit}')
+fi
 
-    RESPONSE=$(curl -s -X POST "$YACI_API_URL/local-cluster/api/topup" \
-        -H "Content-Type: application/json" \
-        -d "{\"address\": \"$ADDRESS\", \"amount\": $LOVELACE}") 
+if [ -z "$CONTAINER" ]; then
+  echo "Error: Yaci DevKit not running. Start with: devkit start"
+  exit 1
+fi
 
-    if echo "$RESPONSE" | jq -e '.txHash' > /dev/null 2>$1; then
-        TX_HASH=$(echo "$RESPONSE" | jq -r '.txHash')
-        echo "  ✓ Funded! Transaction: $TX_HASH"
+echo "Container: $CONTAINER"
+echo ""
 
-        #update wallet JSOn
-        WALLET_FILE="data/wallets/${participant}-wallet.json"   
-        jq ". + {\"fundedAt\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\", \"fundingTx\": \"$TX_HASH\", \"initialBalance\": $LOVELACE}" \
-            "$WALLET_FILE" > "${WALLET_FILE}.tmp" && mv "${WALLET_FILE}.tmp" "$WALLET_FILE"
-
-    else 
-        echo "  ✗ Funding failed! Response: $RESPONSE"
-        exit 1
-    fi
+# Function to fund an address
+fund_address() {
+    local NAME=$1
+    local ADDR=$2
+    local AMOUNT=$3
+    
+    echo "Funding $NAME ($ADDR)..."
+    
+    # Execute topup in the container
+    docker exec "$CONTAINER" bash -c "
+        yaci-cli <<HEREDOC
+topup $ADDR $AMOUNT
+exit
+HEREDOC
+    " 2>&1 | grep -i "success\|funded\|topup" || echo "Command sent"
+    
+    echo "  ✓ Topup request sent for $AMOUNT ADA"
     echo ""
-    sleep 2
-done
+}
 
-echo "waiting for transactions to be confirmed..."
+# Fund all addresses
+fund_address "Alice" "$ALICE_ADDR" 10000
+sleep 3
+fund_address "Bob" "$BOB_ADDR" 10000
+sleep 3
+fund_address "Carol" "$CAROL_ADDR" 10000
+
+echo "Waiting for confirmations (30 seconds)..."
 sleep 30
 
+# Verify balances
 echo ""
-echo "Verifying balnces..."
-echo ""
-
-for participant in "${PARTICIPANTS[@]}"; do
-    ADDRESS=$(cat "hydra-nodes/$participant/keys/cardano.addr")
-
-    #using yaci
-    BALANCE_RESPONSE=$(curl -s "$YACI_API_URL/addresses/$ADDRESS/utxos")
-    if [ ! -z "$BALANCE_RESPONSE" ] && [ "$BALANCE_RESPONSE" != "[]" ]; then
-        # Calculate total balance
-        TOTAL_LOVELACE=$(echo "$BALANCE_RESPONSE" | jq '[.[].amounts[0].quantity] | add')
-        TOTAL_ADA=$(echo "scale=6; $TOTAL_LOVELACE / 1000000" | bc)
-        
-        echo "  $participant: $TOTAL_ADA ADA"
-        echo "    Address: $ADDRESS"
-        echo "    UTXOs: $(echo "$BALANCE_RESPONSE" | jq 'length')"
-    else
-        echo "  $participant: 0 ADA (No UTXOs found)"
-        echo "   Funding may not have completed yet"
-    fi
-    echo ""
+echo "Verifying balances..."
+for name in alice bob carol; do
+    ADDR=$(cat "hydra-nodes/$name/keys/cardano.addr")
+    BALANCE=$(curl -s "$YACI_API_URL/addresses/$ADDR/balance" | jq -r '[.[].amounts[0].quantity // 0] | add')
+    ADA=$(echo "scale=2; ${BALANCE:-0} / 1000000" | bc)
+    echo "  $name: $ADA ADA"
 done
 
-echo "Funding process completed."
+echo ""
+echo "✓ Done!"
