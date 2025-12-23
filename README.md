@@ -169,6 +169,15 @@ Refer to Yaci DevKit documentation for more details:
 
 ---
 
+Also you have to publish scripts in yaci so do 
+```bash
+yaci-hydra % ./bin/hydra-node publish-scripts \
+  --testnet-magic 42 \
+  --node-socket /clusters/nodes/default/node/node.sock \
+  --cardano-signing-key hydra-nodes/alice/keys/cardano.sk
+```
+this will give three hashed paste those with commas in .env for HYDRA_SCRIPTS_TX_ID=paste here
+
 ## Start Hydra Nodes
 
 ### 10. Start Hydra
