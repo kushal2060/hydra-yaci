@@ -28,7 +28,7 @@ for participant in "${PARTICIPANTS[@]}"; do
 
             #if no cardano-cli found
             echo " (using hydra-nodes cardano cli) "
-            ./bin/hydra-node cardano-cli address key-gen \
+            ./bin/cardano-cli address key-gen \
                 --verification-key-file "$KEY_DIR/cardano.vk" \
                 --signing-key-file "$KEY_DIR/cardano.sk"
     }
@@ -40,7 +40,7 @@ for participant in "${PARTICIPANTS[@]}"; do
         --testnet-magic $NETWORK_MAGIC \
         --out-file "$KEY_DIR/cardano.addr" 2>/dev/null || {
         
-        ./bin/hydra-node cardano-cli address build \
+        ./bin/cardano-cli address build \
             --payment-verification-key-file "$KEY_DIR/cardano.vk" \
             --testnet-magic $NETWORK_MAGIC \
             --out-file "$KEY_DIR/cardano.addr"
