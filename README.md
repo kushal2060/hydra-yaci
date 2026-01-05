@@ -13,6 +13,8 @@ These wrappers generate keys for all participants.
 
 ## 📚 Documentation
 
+**📖 [View Full Documentation](https://kushal2060.github.io/hydra-yaci/)** - Complete documentation site deployed on GitHub Pages
+
 For comprehensive documentation, see the [Documentation Directory](.github/docs/):
 
 - **[Getting Started Guide](.github/docs/getting-started.md)** - Quick start tutorial
@@ -293,6 +295,7 @@ You should see the following as the first log:
 
 For more detailed information, check out the comprehensive documentation:
 
+- **🌐 [Documentation Website](https://kushal2060.github.io/hydra-yaci/)** - Full documentation site (GitHub Pages)
 - **[Complete Documentation Index](.github/docs/index.md)** - Full documentation hub
 - **[Getting Started](.github/docs/getting-started.md)** - Beginner's guide
 - **[Troubleshooting](.github/docs/troubleshooting.md)** - Fix common issues

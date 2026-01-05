@@ -2,6 +2,12 @@
 
 Welcome to the Hydra-Yaci documentation! This directory contains comprehensive guides for using Hydra protocols with Yaci DevKit.
 
+## 🌐 Live Documentation
+
+**View the documentation online:** [https://kushal2060.github.io/hydra-yaci/](https://kushal2060.github.io/hydra-yaci/)
+
+The documentation is automatically deployed to GitHub Pages. See [DEPLOYMENT.md](DEPLOYMENT.md) for deployment details.
+
 ## 📚 Documentation Structure
 
 ### Core Documentation
@@ -49,6 +55,14 @@ Welcome to the Hydra-Yaci documentation! This directory contains comprehensive g
    - Example scripts
    - REST API
    - Monitoring API
+
+### Additional Resources
+
+8. **[Deployment Guide](DEPLOYMENT.md)** - Documentation deployment
+   - How the documentation is deployed
+   - Making changes to documentation
+   - Local preview setup
+   - Troubleshooting deployment issues
 
 ## 🚀 Quick Navigation
 
