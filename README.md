@@ -1,4 +1,4 @@
-````md
+
 # Yaci + Hydra Local Devnet (Payment Example)
 
 This is a project for using Hydra protocols in a Yaci DevKit local network.
