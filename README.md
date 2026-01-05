@@ -11,6 +11,17 @@ A wrapper is provided in `bin/hydra-node`.
 The same applies to `cardano-cli`; its wrapper is in `bin/cardano-cli`.  
 These wrappers generate keys for all participants.
 
+## 📚 Documentation
+
+For comprehensive documentation, see the [Documentation Directory](.github/docs/):
+
+- **[Getting Started Guide](.github/docs/getting-started.md)** - Quick start tutorial
+- **[Installation Guide](.github/docs/installation.md)** - Detailed installation instructions
+- **[Configuration Guide](.github/docs/configuration.md)** - Configuration reference
+- **[Usage Guide](.github/docs/usage.md)** - Complete usage documentation
+- **[API Reference](.github/docs/api-reference.md)** - API documentation
+- **[Troubleshooting Guide](.github/docs/troubleshooting.md)** - Common issues and solutions
+
 ---
 
 ## Prerequisites & Setup
@@ -276,5 +287,32 @@ You should see the following as the first log:
 }
 ```
 
-```
+---
+
+## 📖 Further Reading
+
+For more detailed information, check out the comprehensive documentation:
+
+- **[Complete Documentation Index](.github/docs/index.md)** - Full documentation hub
+- **[Getting Started](.github/docs/getting-started.md)** - Beginner's guide
+- **[Troubleshooting](.github/docs/troubleshooting.md)** - Fix common issues
+- **[API Reference](.github/docs/api-reference.md)** - Complete API documentation
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 👤 Author
+
+**Kushal Acharya** :)
+
+## 🙏 Acknowledgments
+
+- [Cardano Scaling](https://github.com/cardano-scaling) - Hydra protocol
+- [Yaci DevKit](https://devkit.yaci.xyz/) - Local development network
+- [Lucid Evolution](https://github.com/lucid-evolution) - Cardano library
 ```
