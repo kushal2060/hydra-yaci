@@ -1,0 +1,7 @@
+theme: jekyll-theme-cayman
+title: Hydra-Yaci Documentation
+description: Complete guide for using Hydra protocols with Yaci DevKit local network
+show_downloads: true
+github:
+  repository_url: https://github.com/kushal2060/hydra-yaci
+  is_project_page: true
