@@ -1,0 +1,58 @@
+services:
+  kuber:
+    image: dquadrant/kuber:${KUBER_VERSION:-3.1.1}
+    container_name: kuber-server
+    platform: linux/amd64
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./config:/config
+      - ./hydra-nodes:/hydra-nodes
+    volumes_from:
+      - container:node1-yaci-cli-1
+    environment:
+      - CARDANO_NODE_SOCKET_PATH=/clusters/nodes/default/node/node.sock
+      - NETWORK=42
+    restart: unless-stopped
+
+  kuber-hydra-1:
+    image: dquadrant/kuber-hydra:latest
+    container_name: kuber-hydra-alice
+    platform: linux/amd64
+    ports:
+      - "8082:8081"
+    environment: 
+      - HYDRA_URL=host.docker.internal:5001
+      - CARDANO_NODE_SOCKET_PATH=/clusters/nodes/default/node/node.sock
+      - NETWORK=42
+    volumes_from:
+      - container:node1-yaci-cli-1
+    restart: unless-stopped
+
+  kuber-hydra-2:
+    image: dquadrant/kuber-hydra:latest
+    container_name: kuber-hydra-bob
+    platform: linux/amd64
+    ports: 
+      - "8083:8081"
+    environment:
+      - HYDRA_URL=host.docker.internal:5002
+      - CARDANO_NODE_SOCKET_PATH=/clusters/nodes/default/node/node.sock
+      - NETWORK=42
+    volumes_from:
+      - container:node1-yaci-cli-1
+    restart: unless-stopped
+
+  kuber-hydra-3:
+    image: dquadrant/kuber-hydra:latest
+    container_name: kuber-hydra-carol
+    platform: linux/amd64
+    ports:
+      - "8084:8081"
+    environment: 
+      - HYDRA_URL=host.docker.internal:5003
+      - CARDANO_NODE_SOCKET_PATH=/clusters/nodes/default/node/node.sock
+      - NETWORK=42
+    volumes_from: 
+      - container:node1-yaci-cli-1
+    restart: unless-stopped
