@@ -21,9 +21,7 @@ echo "  Pulling Hydra node..."
 docker pull --platform linux/arm64 ghcr.io/cardano-scaling/hydra-node:$HYDRA_VERSION
 
 echo "  Pulling Cardano CLI..."
-docker pull --platform  ghcr.io/blinklabs-io/cardano-node:main-arm64v8
-
-
+docker pull --platform linux/arm64 ghcr.io/blinklabs-io/cardano-node:main-arm64v8
 
 echo ""
 echo "✓ Docker images pulled"
