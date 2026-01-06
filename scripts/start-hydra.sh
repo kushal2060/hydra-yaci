@@ -14,12 +14,6 @@ if ! curl -s http://localhost:8080/api/v1/epochs/latest > /dev/null 2>&1; then
     exit 1
 fi
 
-#check socat bridge
-SOCKET_PATH="/clusters/nodes/default/node/node.sock"
-echo "Using node socket: $SOCKET_PATH (from YACI container)"
-echo "Network magic: $NETWORK_MAGIC"
-echo ""
-
 #start hydra
 start_hydra_node() {
     local NAME=$1
@@ -142,14 +136,14 @@ fi
 #start nodes - NOW PASSING THE 5TH PARAMETER (ADVERTISED_HOST)
 start_hydra_node "alice" $HYDRA_API_PORT_ALICE $HYDRA_PEER_PORT_ALICE $HYDRA_MONITORING_PORT_ALICE $HYDRA_HOST_ALICE
 echo "Waiting for Alice to initialize cluster..."
-sleep 15
+sleep 5
 
 start_hydra_node "bob" $HYDRA_API_PORT_BOB $HYDRA_PEER_PORT_BOB $HYDRA_MONITORING_PORT_BOB $HYDRA_HOST_BOB
-sleep 15
+sleep 5
 
 start_hydra_node "carol" $HYDRA_API_PORT_CAROL $HYDRA_PEER_PORT_CAROL $HYDRA_MONITORING_PORT_CAROL $HYDRA_HOST_CAROL
 echo "waiting for Hydra nodes to start..."
-sleep 10
+sleep 5
 
 echo "Hydra nodes started successfully!"
 echo "Verifying node status..."
