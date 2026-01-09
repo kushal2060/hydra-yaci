@@ -217,11 +217,13 @@ Three Docker containers should start, exposing ports:
 ```bash
 docker run --rm -it \
   --name hydra-tui-alice \
-  -v "$PWD/hydra-nodes:/app/hydra-nodes" \
+  -v "$PWD/hydra-nodes/alice/keys:/keys" \
+  --volumes-from node1-yaci-cli-1 \
   --platform linux/amd64 \
   ghcr.io/cardano-scaling/hydra-tui:1.2.0 \
   --connect host.docker.internal:4001 \
-  --cardano-signing-key /app/hydra-nodes/alice/keys/cardano.sk \
+  --cardano-signing-key /keys/cardano.sk \
+  --node-socket /clusters/nodes/default/node/node.sock \
   --testnet-magic 42
 ```
 
