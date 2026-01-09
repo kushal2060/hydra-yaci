@@ -221,7 +221,7 @@ docker run --rm -it \
   --platform linux/amd64 \
   ghcr.io/cardano-scaling/hydra-tui:1.2.0 \
   --connect host.docker.internal:4001 \
-  --cardano-signing-key /app/hydra-nodes/bob/keys/cardano.sk \
+  --cardano-signing-key /app/hydra-nodes/alice/keys/cardano.sk \
   --testnet-magic 42
 ```
 
