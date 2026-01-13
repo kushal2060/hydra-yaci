@@ -13,7 +13,7 @@ echo ""
 
 HYDRA_VERSION="1.2.0"
 
-# Step 1: Pull required Docker images for ARM64
+#  Docker images for ARM64
 echo "Step 1: Pulling Docker images for ARM64..."
 echo ""
 
@@ -27,7 +27,7 @@ echo ""
 echo "✓ Docker images pulled"
 echo ""
 
-# Step 2: Create hydra-node wrapper
+#  hydra-node wrapper
 echo "Step 2: Creating hydra-node wrapper..."
 
 cat > bin/hydra-node <<'EOF'
@@ -52,7 +52,7 @@ EOF
 chmod +x bin/hydra-node
 echo "  ✓ Created bin/hydra-node"
 
-# Step 3: Create cardano-cli wrapper
+#  cardano-cli wrapper
 echo "Step 3: Creating cardano-cli wrapper..."
 
 cat > bin/cardano-cli <<'EOF'
